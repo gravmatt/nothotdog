@@ -57,6 +57,7 @@ app.post('/nothotdog', (req, res) => {
                 fs.readFile(imageFile, (err, data) => {
                     if(err) reject(err);
                     else resolve(data);
+                    fs.unlink(imageFile);
                 });
             });
         })

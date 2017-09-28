@@ -83,6 +83,10 @@ app.post('/nothotdog', (req, res) => {
         })
         .then((isHotdog) => {
             res.sendText(isHotdog ? 'Hotdog' : 'Not Hotdog');
+        })
+        .catch((err) => {
+            console.log(err);
+            res.sendText('Error! Will try to fix it until the final presentation. sorry 😅');
         });
     }
     else {

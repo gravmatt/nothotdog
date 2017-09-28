@@ -1,0 +1,35 @@
+{
+  "name": "nothotdog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@orat.io/integration-sdk": "^1.0.0",
+    "aws-sdk": "^2.124.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.15.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gravmatt/nothotdog.git"
+  },
+  "keywords": [
+    "hotdog",
+    "nodejs",
+    "node",
+    "rekognition",
+    "aws",
+    "aws-sdk-js",
+    "jinjiang"
+  ],
+  "author": "Rene Tanczos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gravmatt/nothotdog/issues"
+  },
+  "homepage": "https://github.com/gravmatt/nothotdog#readme"
+}

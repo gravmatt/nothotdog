@@ -75,6 +75,7 @@ app.post('/nothotdog', (req, res) => {
                         reject(err);
                     }
                     else {
+                        console.log(data);
                         const len = data.Labels.filter((label => {return label.Name === 'Hot Dog'})).length;
                         resolve(len > 0);
                     }

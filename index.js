@@ -38,40 +38,50 @@ function getRandomFile() {
     return path.join(downloads, random(32));
 }
 
-app.post('/nohotdog', (req, res) => {
+app.post('/nothotdog', (req, res) => {
     console.log(req.body);
 
     if(req.body.message.type === 'image') {
-        (req.body.message.content.startsWith('https') ? https : http)
-        .get(req.body.message.content, (result) => {
-            const imageFile = getRandomFile();
-
-            result.pipe(fs.createWriteStream(imageFile))
-            .on('finish', () => {
+        new Promise((resolve, reject) => {
+            (req.body.message.content.startsWith('https') ? https : http)
+            .get(req.body.message.content, (result) => {
+                const imageFile = getRandomFile();
+                result.pipe(fs.createWriteStream(imageFile))
+                .on('finish', () => {
+                    resolve(imageFile);
+                });
+            });
+        })
+        .then((imageFile) => {
+            return new Promise((resolve, reject) => {
+                fs.readFile(imageFile, (err, data) => {
+                    if(err) reject(err);
+                    else resolve(data);
+                });
+            });
+        })
+        .then((imageData) => {
+            return new Promise((resolve, reject) => {
                 const params = {
                     Image: {
-                        Bytes: new Buffer(fs.readFileSync(imageFile))
+                        Bytes: new Buffer(imageData)
                     },
                     MaxLabels: 5,
                     MinConfidence: 80
                 };
-
                 r.detectLabels(params, (err, data) => {
                     if(err) {
-                        console.log(err);
+                        reject(err);
                     }
                     else {
-                        if(data.Labels.filter((label => {
-                            return label.Name === 'Hot Dog';
-                        })).length > 0) {
-                            res.sendText('Hotdog');
-                        }
-                        else {
-                            res.sendText('No Hotdog');
-                        }
+                        const len = data.Labels.filter((label => {return label.Name === 'Hot Dog'})).length;
+                        resolve(len > 0);
                     }
                 });
             });
+        })
+        .then((isHotdog) => {
+            res.sendText(isHotdog ? 'Hotdog' : 'Not Hotdog');
         });
     }
     else {

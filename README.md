@@ -14,6 +14,7 @@ npm install
 
 Edit `aws-config.js` and add your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 
+*Btw you need a AWS account.*
 
 ## Run it
 

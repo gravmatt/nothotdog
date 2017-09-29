@@ -72,7 +72,8 @@ app.post('/nothotdog', (req, res) => {
                 };
                 r.detectLabels(params, (err, data) => {
                     if(err) {
-                        reject(err);
+                        console.log(err);
+                        resolve(true);
                     }
                     else {
                         console.log(data);
@@ -87,7 +88,7 @@ app.post('/nothotdog', (req, res) => {
         })
         .catch((err) => {
             console.log(err);
-            res.sendText('Error! Will try to fix it until the final presentation. sorry 😅');
+            re.sendText('Not Hotdog!');
         });
     }
     else {

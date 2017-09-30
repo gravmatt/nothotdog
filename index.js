@@ -73,7 +73,7 @@ app.post('/nothotdog', (req, res) => {
                 r.detectLabels(params, (err, data) => {
                     if(err) {
                         console.log(err);
-                        resolve(true);
+                        resolve(false);
                     }
                     else {
                         console.log(data);

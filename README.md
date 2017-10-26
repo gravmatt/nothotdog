@@ -12,7 +12,13 @@ npm install
 
 ## Setup
 
-Edit `aws-config.js` and add your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+Edit `config.js` with:
+
+Add a random string here `FACEBOOK_VERIFY_TOKEN`. It is needed to set the webhook if you don't know how to deal with the verification process.
+
+`FACEBOOK_PAGE_TOKEN` is needed to give your bot permission to response with a message.
+
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` is needed to talk to the amazon API.
 
 *Btw you need a AWS account.*
 

@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@orat.io/integration-sdk": "^1.0.0",
     "aws-sdk": "^2.124.0",
     "body-parser": "^1.18.2",
-    "express": "^4.15.5"
+    "express": "^4.15.5",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {},
   "scripts": {

@@ -1,99 +1,60 @@
 'use strict';
 
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const path = require('path');
-const awsConfig = require('./aws-config');
-const Rekognition = require('aws-sdk/clients/rekognition');
-const r = new Rekognition(awsConfig);
+const config = require('./config');
+const Hotdog = require('./Hotdog');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const oratio = require('@orat.io/integration-sdk');
 const PORT = process.env.NOTHOTDOG_PORT || 8082;
-const botToken = '';
 
-app.set('trust proxy', 1);
-app.set('x-powered-by', false);
-
-app.disable('etag');
-app.disable('view cache');
 
 app.use(bodyParser.json());
-app.use(oratio());
 
-function random(len) {
-    let rdmString = "";
-    for (; rdmString.length < len; rdmString += Math.random().toString(36).substr(2))
-;
-    return rdmString.substr(0, len);
-}
 
-function getRandomFile() {
-    const downloads = path.join(__dirname, 'downloads');
-    if(!fs.existsSync(downloads)) {
-        fs.mkdirSync(downloads);
+app.get('/webhook', (req, res) => {
+  // Parse the query params
+  let mode = req.query['hub.mode'];
+  let token = req.query['hub.verify_token'];
+  let challenge = req.query['hub.challenge'];
+
+  // Checks if a token and mode is in the query string of the request
+  if (mode && token) {
+    // Checks the mode and token sent is correct
+    if (mode === 'subscribe' && token === config.facebook.verifyToken) {
+      // Responds with the challenge token from the request
+      console.log('WEBHOOK_VERIFIED');
+      res.status(200).send(challenge);
+    } else {
+      // Responds with '403 Forbidden' if verify tokens do not match
+      res.sendStatus(403);
     }
-    return path.join(downloads, random(32));
-}
+  }
+});
 
-app.post('/nothotdog', (req, res) => {
-    console.log(req.body);
+app.post('/webhook', (req, res) => {
+    let body = req.body;
 
-    if(req.body.message.type === 'image') {
-        new Promise((resolve, reject) => {
-            (req.body.message.content.startsWith('https') ? https : http)
-            .get(req.body.message.content, (result) => {
-                const imageFile = getRandomFile();
-                result.pipe(fs.createWriteStream(imageFile))
-                .on('finish', () => {
-                    resolve(imageFile);
-                });
-            });
-        })
-        .then((imageFile) => {
-            return new Promise((resolve, reject) => {
-                fs.readFile(imageFile, (err, data) => {
-                    if(err) reject(err);
-                    else resolve(data);
-                    fs.unlink(imageFile);
-                });
-            });
-        })
-        .then((imageData) => {
-            return new Promise((resolve, reject) => {
-                const params = {
-                    Image: {
-                        Bytes: new Buffer(imageData)
-                    },
-                    MaxLabels: 5,
-                    MinConfidence: 80
-                };
-                r.detectLabels(params, (err, data) => {
-                    if(err) {
-                        console.log(err);
-                        resolve(false);
-                    }
-                    else {
-                        console.log(data);
-                        const len = data.Labels.filter((label => {return label.Name === 'Hot Dog'})).length;
-                        resolve(len > 0);
-                    }
-                });
-            });
-        })
-        .then((isHotdog) => {
-            res.sendText(isHotdog ? 'Hotdog' : 'Not Hotdog');
-        })
-        .catch((err) => {
-            console.log(err);
-            re.sendText('Not Hotdog!');
+    // Checks this is an event from a page subscription
+    if (body.object === 'page') {
+        // Iterates over each entry - there may be multiple if batched
+        body.entry.forEach(function(entry) {
+            // Gets the message. entry.messaging is an array, but
+            // will only ever contain one message, so we get index 0
+            const webhookEvent = entry.messaging[0];
+            const hotdog = new Hotdog(webhookEvent);
+
+            if(webhookEvent.message) {
+                hotdog.doIt();
+            }
         });
+
+        // Returns a '200 OK' response to all requests
+        res.status(200).send('EVENT_RECEIVED');
+    } else {
+        // Returns a '404 Not Found' if event is not from a page subscription
+        res.sendStatus(404);
     }
-    else {
-        res.sendText('Only Hotdogs!');
-    }
+
 });
 
 app.listen(PORT, () => {

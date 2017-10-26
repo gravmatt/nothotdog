@@ -11,7 +11,7 @@ const PORT = process.env.NOTHOTDOG_PORT || 8082;
 app.use(bodyParser.json());
 
 
-app.get('/webhook', (req, res) => {
+app.get(config.serverPath, (req, res) => {
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
@@ -31,7 +31,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-app.post('/webhook', (req, res) => {
+app.post(config.serverPath, (req, res) => {
     let body = req.body;
 
     // Checks this is an event from a page subscription

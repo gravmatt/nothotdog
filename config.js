@@ -1,8 +1,9 @@
 'use strict';
 
 module.exports = {
+    serverPath: process.env.NOTHOTDOG_PATH || '/webhook',
     facebook: {
-        verifyToken:process.env.FACEBOOK_VERIFY_TOKEN || '<verify-token>', // add some random string
+        verifyToken: process.env.FACEBOOK_VERIFY_TOKEN || '<verify-token>', // add some random string
         pageToken: process.env.FACEBOOK_PAGE_TOKEN || '<page-token>'
     },
     aws: {
